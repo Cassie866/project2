@@ -1,15 +1,14 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
+
 #include "MD5.h"
 using namespace std;
 
 
 //初m始化static成员
-int MD5::s[64]= { 
+int MD5::s[64] = {
 	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7,  12, 17, 22,
-	5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,        
-	4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 
+	5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+	4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
 	6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21 };
 
 MD5::MD5()
@@ -34,13 +33,13 @@ void MD5::Reset()
 	_b = 0xefcdab89; 
 	_c = 0x98badcfe; 
 	_d = 0x10325476;
-	memset(chunk, 0, 64);
+	memset(_chunk, 0, 64);
 	lastByte = 0;
-	allByte = 0;
+	allBytes = 0;
 }
 
 
-void MD5:: calMD5(uint32* chunk)
+void MD5:: CalMD5(uint32* chunk)
 {
 	int a = _a, b =_b, c =_c, d = _d;
 	int m, g;
@@ -55,14 +54,17 @@ void MD5:: calMD5(uint32* chunk)
 		else if (i < 32)
 		{
 			m = G(b, c, d);
+			g = (5 * i + 1) % 16;
 		}
 		else if (i < 48)
 		{
 			m = H(b, c, d);
+			g = (3 * i + 5) % 16;
 		}
 		else
 		{
 			m = I(b, c, d);
+			g = (7 * i) % 16;
 		}
 		int temp = d;
 		d = c;
@@ -77,17 +79,29 @@ void MD5:: calMD5(uint32* chunk)
 }
 
 
-
-//进行填充再进行计算
-void MD5::calFinalMD5()
+void MD5::CalFinalMD5()
 {
-	char* p = chunk + lastByte;
+	char* p = _chunk + lastByte;
 	*p++ = 0x80;
 	int remain = 64 - lastByte - 1;
+	if (remain < 8)
+	{
+		memset(p, 0, remain);
+		CalMD5((uint32*)_chunk);
+		memset(_chunk, 0, 64);
+	}
+	else
+	{
+		memset(p, 0, remain);
+	}
+	unsigned long long allBites = allBytes;
+	allBites *= 8;
+	((unsigned long long*)_chunk)[7] = allBites;
+	CalMD5((uint32*)_chunk);
 }
 
 
-string change(uint32 n)
+string MD5::Change(uint32 n)
 {
 	static string strmap = "0123456789abcdef";
 	string ret;
@@ -106,122 +120,53 @@ string change(uint32 n)
 }
 
 
-
-string getstringMD5(const string& str);
-string getFilesMD5(const char* f);
-
+string MD5::GetstringMD5(const string& str)
+{}
 
 
 
 
+string MD5::GetFilesMD5(const char* f)
+{}
 
 
 
-
-
-
-////F函数处理
-//void Fc()
+//long GetFileSize(const std::string& file_name)
 //{
-//	int f = 0;
-//	int m = 0;
-//	for (int j = 0; j < 16; ++j)
-//	{
-//		m = j;
-//		f = F(b, c, d);
-//		d = c;
-//		c = b;
-//		b = b + (a + f + k[i] + chunk[m])<<s[i];
-//		a = d;
-//	}
-//}
-
-//void Gc()
-//{
-//	int g = 0;
-//	int m = 0;
-//	for (int j = 16; j < 32; ++j)
-//	{
-//		g = G(b, c, d);
-//		d = c;
-//		c = b;
-//		b = b + shift((a + g + k[i] + chunk[(5 * i + 1) % 16]), s[i]);
-//		a = d;
-//	}
+//	std::ifstream in(file_name.c_str());
+//	in.seekg(0, std::ios::end);
+//	long size = in.tellg();
+//	in.close();
+//	return size;
 //}
 //
-//void Hc()
+////1.添加填充位，添加bit长度
+//long Add(long length)
 //{
-//	int h = 0;
-//	int m = 0;
-//	for (int j = 32; j < 47; ++j)
+//	int yushu = length % 512;
+//	int weishu = 0;
+//	//计算需要填充的位数
+//	if (yushu < 448)
 //	{
-//		h = H(b, c, d);
-//		d = c;
-//		c = b;
-//		b = b + shift((a + h + k[i] + chunk[(3 * i + 5) % 16]), s[i]);
-//		a = d;
+//		weishu = 512 - yushu - 64;
 //	}
+//	else
+//	{
+//		weishu = 512 + 512 - yushu - 64;
+//	}
+//
+//	return weishu;
+//	//文件按位填充b位，第一位填充1，其余为0
+//   //在文件后面再追加64位，填充原始文件长度
 //}
 //
-//void Ic()
+//int main()
 //{
-//	int i= 0;
-//	int m = 0;
-//	for (int j = 48; j < 63; ++j)
-//	{
-//		i = I(b, c, d);
-//		d = c;
-//		c = b;
-//		b = b + shift((a + i + k[i] + chunk[(7 * i) % 16]), s[i]);
-//		a = d;
-//	}
+//	long size = GetFileSize("1.txt");
+//	long length = size * 8;
+//	long weishu=Add(length);
+//	ofstream file;
+//	file.open("1.txt", ios::ate|ios::binary);
+//	file.close();
+//	return 0;
 //}
-
-
-
-long GetFileSize(const std::string& file_name)
-{
-	std::ifstream in(file_name.c_str());
-	in.seekg(0, std::ios::end);
-	long size = in.tellg();
-	in.close();
-	return size;
-}
-
-//1.添加填充位，添加bit长度
-long Add(long length)
-{
-	int yushu = length % 512;
-	int weishu = 0;
-	//计算需要填充的位数
-	if (yushu < 448)
-	{
-		weishu = 512 - yushu - 64;
-	}
-	else
-	{
-		weishu = 512 + 512 - yushu - 64;
-	}
-
-	return weishu;
-	//文件按位填充b位，第一位填充1，其余为0
-   //在文件后面再追加64位，填充原始文件长度
-}
-
-int main()
-{
-	long size = GetFileSize("1.txt");
-	long length = size * 8;
-	long weishu=Add(length);
-	ofstream file;
-	file.open("1.txt", ios::ate|ios::binary);
-	
-
-	file.close();
-
-
-
-
-	return 0;
-}

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+
 typedef unsigned int uint32;
 
 class MD5
@@ -38,32 +39,27 @@ class MD5
 	void Reset();
 
 	//一个chunk的MD5运算
-	void calMD5(uint32*chunk);
+	void CalMD5(uint32*chunk);
 
 	//进行填充再进行计算
-	void calFinalMD5();
+	void CalFinalMD5();
 
 	//把整数转换成16进制字符串
-	string change()
+	string Change(uint32 n);
 
-
-
-	string getstringMD5(const string& str);
-	string getFilesMD5(const char* f);
+	string GetstringMD5(const string& str);
+	string GetFilesMD5(const char* f);
 
 private:
 	static int s[64];//循环移位的位数
 	uint32 k[64];//k[i]	
-	char chunk[64];//数据块  64字节
+	char _chunk[64];//数据块  64字节
 	
 	uint32 lastByte;//最后一块数据的字节数	
-	uint32 allByte;//总体字节数，转换成位
+	uint32 allBytes;//总体字节数，转换成位
 	
 	uint32 _a;   //MD5信息 ABCD
 	uint32 _b;
 	uint32 _c;
 	uint32 _d;
 };
-
-
-
