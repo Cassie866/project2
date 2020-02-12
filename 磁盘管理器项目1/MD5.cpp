@@ -139,8 +139,8 @@ string MD5::GetFilesMD5(const char* f)
 //	in.close();
 //	return size;
 //}
-//
-////1.添加填充位，添加bit长度
+
+
 //long Add(long length)
 //{
 //	int yushu = length % 512;
@@ -154,10 +154,7 @@ string MD5::GetFilesMD5(const char* f)
 //	{
 //		weishu = 512 + 512 - yushu - 64;
 //	}
-//
 //	return weishu;
-//	//文件按位填充b位，第一位填充1，其余为0
-//   //在文件后面再追加64位，填充原始文件长度
 //}
 //
 //int main()
