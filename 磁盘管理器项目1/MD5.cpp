@@ -1,111 +1,125 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "MD5.h"
 using namespace std;
-//class MD5
-//{
-//	MD5()
-//		:A(0x67452301),B(0xefcdab89),C(0x98badcfe),D(0x10325476)
-//	{
-//		a = A;
-//		b = B;
-//		c = C;
-//		d = D;
-//		for (int i=0;i<64;++i)
-//		{
-//			k[i] = (size_t)(abs(sin(i + 1)) * pow(2, 32));
-//		}
-//		for (int i = 0; i < 16; i+=4)
-//		{
-//			s[i] = 7;
-//			s[i + 1] = 12;
-//			s[i + 2] = 17;
-//			s[i + 3] = 22;
-//		}
-//		for (int i = 16; i < 32; i += 4)
-//		{
-//			s[i] = 5;
-//			s[i + 1] = 9;
-//			s[i + 2] = 14;
-//			s[i + 3] = 20;
-//		}
-//		for (int i = 32; i < 48; i += 4)
-//		{
-//			s[i] = 4;
-//			s[i + 1] = 11;
-//			s[i + 2] = 16;
-//			s[i + 3] = 23;
-//		}
-//		for (int i = 48; i < 64; i += 4)
-//		{
-//			s[i] = 6;
-//			s[i + 1] = 10;
-//			s[i + 2] = 15;
-//			s[i + 3] = 21;
-//		}
-//	}
-//
-//	//处理函数
-//	int F(int& x, int& y, int& z)
-//	{
-//		return   (x & y) | ((~x) & z);
-//	}
-//
-//	int G(int& x, int& y, int& z)
-//	{
-//		return   (x & z) | (y & (~z));
-//	}
-//
-//	int H(int& x, int& y, int& z)
-//	{
-//		return    x ^ y ^ z;
-//	}
-//
-//	int I(int& x, int& y, int& z)
-//	{
-//		return   y ^ (x | (~z));
-//	}
-//
-//	void Add(long length);
-//
-//private:
-//	int A;
-//	int B;
-//	int C;
-//	int D;
-//	int a;
-//	int b;
-//	int c;
-//	int d;
-//	std::vector<long>k;
-//	std::vector<int>s;
-//};
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-////3.按512位数据逐块处理输入信息
-////分成大小为512的块
-//
-//
-//
-//
-//
-////
-//void Chunk(int m)
-//{
-//	
-//}
-//
-//
-//
-//
+
+
+//初m始化static成员
+int MD5::s[64]= { 
+	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7,  12, 17, 22,
+	5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,        
+	4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 
+	6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21 };
+
+MD5::MD5()
+{
+	Init();
+}
+
+
+void MD5::Init()
+{
+	for (int i = 0; i < 64; ++i)
+	{
+		k[i] = (uint32)(abs(sin(i + 1.0)) * pow(2.0, 32));
+	}
+	Reset();
+}
+
+
+void MD5::Reset()
+{
+	_a = 0x67452301; 
+	_b = 0xefcdab89; 
+	_c = 0x98badcfe; 
+	_d = 0x10325476;
+	memset(chunk, 0, 64);
+	lastByte = 0;
+	allByte = 0;
+}
+
+
+void MD5:: calMD5(uint32* chunk)
+{
+	int a = _a, b =_b, c =_c, d = _d;
+	int m, g;
+
+	for (int i = 0; i < 64; i++)
+	{
+		if (0 <= i && i < 16)
+		{
+			m=F(b, c, d);
+			g = i;
+		}
+		else if (i < 32)
+		{
+			m = G(b, c, d);
+		}
+		else if (i < 48)
+		{
+			m = H(b, c, d);
+		}
+		else
+		{
+			m = I(b, c, d);
+		}
+		int temp = d;
+		d = c;
+		c = b;
+		b = b + LeftShift((a + m + k[i] + chunk[g]), s[i]);
+		a = temp;
+	}
+	_a += a;
+	_b += b;
+	_c += c;
+	_d += d;
+}
+
+
+
+//进行填充再进行计算
+void MD5::calFinalMD5()
+{
+	char* p = chunk + lastByte;
+	*p++ = 0x80;
+	int remain = 64 - lastByte - 1;
+}
+
+
+string change(uint32 n)
+{
+	static string strmap = "0123456789abcdef";
+	string ret;
+	//获取每一个字节数据
+	for (int i = 0; i < 64; ++i)
+	{
+		int cur = (n >> (i * 8)) & 0xff;
+		//数据转成16进制字符
+		string curR;
+		//除以16获取高位，模16获取低位,字节内不逆序
+		curR += strmap[cur / 16];
+		curR += strmap[cur % 16];
+		ret += curR;
+	}
+	return ret;	
+}
+
+
+
+string getstringMD5(const string& str);
+string getFilesMD5(const char* f);
+
+
+
+
+
+
+
+
+
+
+
 ////F函数处理
 //void Fc()
 //{
@@ -121,7 +135,7 @@ using namespace std;
 //		a = d;
 //	}
 //}
-//
+
 //void Gc()
 //{
 //	int g = 0;
@@ -163,13 +177,6 @@ using namespace std;
 //		a = d;
 //	}
 //}
-
-
-
-
-//4.摘要输出
-
-
 
 
 
@@ -217,8 +224,4 @@ int main()
 
 
 	return 0;
-
-
-
-
 }
