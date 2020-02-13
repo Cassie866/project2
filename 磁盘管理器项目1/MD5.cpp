@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <fstream>
 #include "MD5.h"
 using namespace std;
 
@@ -121,42 +121,59 @@ string MD5::Change(uint32 n)
 
 
 string MD5::GetstringMD5(const string& str)
-{}
+{
+	if (str.empty())
+	{
+		return Change(_a).append(Change(_b)).append;
+	}
+	allBytes = str.size();
+	uint32 chunknum = allBytes / 64;
+
+
+
+	return Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
+}
 
 
 
 
 string MD5::GetFilesMD5(const char* f)
-{}
+{
+	ifstream fin(f);
+	if (!fin.is_open())
+	{
+		cout << f;
+		perror("failed!");
+		return "";
+	}
+	while (!fin.eof())
+	{
+		/*//全部读进来，空间换时间
+		fin.seekg(0, fin.end);
+		uint32 length = fin.tellg();
+		fin.seekg(0, fin.beg);
+		char* allData = new char[length];
+		fin.read(allData, length);*/
+
+		//每次读取一块数据 时间换空间
+		fin.read(_chunk, 64);
+		if (64 != fin.gcount())
+		{
+			break;
+		}
+		allBytes += 64;
+		CalMD5((uint32*)_chunk);
+	}
+	lastByte = fin.gcount();
+	allBytes += lastByte;
+	CalFinalMD5();
+	return Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
+}
 
 
 
-//long GetFileSize(const std::string& file_name)
-//{
-//	std::ifstream in(file_name.c_str());
-//	in.seekg(0, std::ios::end);
-//	long size = in.tellg();
-//	in.close();
-//	return size;
-//}
 
 
-//long Add(long length)
-//{
-//	int yushu = length % 512;
-//	int weishu = 0;
-//	//计算需要填充的位数
-//	if (yushu < 448)
-//	{
-//		weishu = 512 - yushu - 64;
-//	}
-//	else
-//	{
-//		weishu = 512 + 512 - yushu - 64;
-//	}
-//	return weishu;
-//}
-//
 //int main()
 //{
 //	long size = GetFileSize("1.txt");
