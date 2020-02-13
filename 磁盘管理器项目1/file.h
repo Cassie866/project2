@@ -2,20 +2,24 @@
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
+#include  "MD5.h"
+
 class FileManager
 {
 public:
-	void scannerDir(const std::string& path);
-	
-	getMd5toFiles();
-	getCopyList();
-
+	void scanDisk(const std::string& path);
+	void getMd5toFiles();
+	void getCopyList();
 
 	//所有的删除，保证一个文件不存在副本
 	void deleteByName(const std::string& name);
 	void deleteByMD5(const std::string& md5);
 	void deleteAllCopy();
 	void deleteByMatchName(const std::string& matchName);
+
+	void showCopyList();
+	void showAllFile();
+	void showMD5Map();
 
 private:
 	std::unordered_set<std::string> _files;

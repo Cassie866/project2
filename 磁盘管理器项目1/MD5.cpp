@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
+
 #include "MD5.h"
-using namespace std;
+
 
 
 //初m始化static成员
@@ -101,49 +102,55 @@ void MD5::CalFinalMD5()
 }
 
 
-string MD5::Change(uint32 n)
+std::string MD5::Change(uint32 n)
 {
-	static string strmap = "0123456789abcdef";
-	string ret;
+	static std::string strmap = "0123456789abcdef";
+	std::string ret;
 	//获取每一个字节数据
-	for (int i = 0; i < 64; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		int cur = (n >> (i * 8)) & 0xff;
 		//数据转成16进制字符
-		string curR;
+		std::string curR;
 		//除以16获取高位，模16获取低位,字节内不逆序
 		curR += strmap[cur / 16];
-		curR += strmap[cur % 16];
+		curR += strmap[cur % 16];		
 		ret += curR;
 	}
 	return ret;	
 }
 
 
-string MD5::GetstringMD5(const string& str)
+std::string MD5::GetstringMD5(const std:: string& str)
 {
 	if (str.empty())
 	{
-		return Change(_a).append(Change(_b)).append;
+		Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
 	}
 	allBytes = str.size();
 	uint32 chunknum = allBytes / 64;
-
-
-
+	const char* strptr = str.c_str();
+	for (int i = 0; i < chunknum; ++i)
+	{
+		memcpy(_chunk, strptr + i * 64, 64);
+		CalMD5((uint32*)_chunk);
+	}
+	lastByte + allBytes % 64;
+	memcpy(_chunk, strptr + chunknum * 64, lastByte);
+	CalFinalMD5();
 	return Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
 }
 
 
 
 
-string MD5::GetFilesMD5(const char* f)
+std::string MD5::GetFilesMD5(const char* filePath)
 {
-	ifstream fin(f);
+	std::ifstream fin(filePath,std::ifstream::binary);
 	if (!fin.is_open())
 	{
-		cout << f;
-		perror("failed!");
+		std::cout << filePath;
+		perror("file open failed!");
 		return "";
 	}
 	while (!fin.eof())

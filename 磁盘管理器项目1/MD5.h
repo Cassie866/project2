@@ -5,6 +5,7 @@ typedef unsigned int uint32;
 
 class MD5
 {
+public:
 	MD5();
 
 	//位运算处理函数
@@ -45,10 +46,9 @@ class MD5
 	void CalFinalMD5();
 
 	//把整数转换成16进制字符串
-	string Change(uint32 n);
-
-	string GetstringMD5(const string& str);
-	string GetFilesMD5(const char* f);
+	std::string Change(uint32 n);
+	std::string GetstringMD5(const std:: string& str);
+	std::string GetFilesMD5(const char* f);
 
 private:
 	static int s[64];//循环移位的位数
