@@ -28,10 +28,10 @@ void testFileMD5()
 }
 
 
-int main()
-{
-	//testStringMD5();
-	//testFileMD5();
-	//testchange();
-	return 0;
-}
+//int main()
+//{
+//	//testStringMD5();
+//	//testFileMD5();
+//	//testchange();
+//	return 0;
+//}

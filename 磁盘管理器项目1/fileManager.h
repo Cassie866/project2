@@ -14,11 +14,12 @@ public:
 	//所有的删除要保证一个文件不存在副本
 	void deleteByName(const std::string& name);
 	void deleteByMD5(const std::string& md5);
+	void deleteByMD52(const std::string& md5);
 	void deleteAllCopy();
 	void deleteByMatchName(const std::string& matchName);
 
 	void showCopyList();
-	void showAllFile();
+	void showAllFiles();
 
 private:
 	std::unordered_set<std::string> _files;

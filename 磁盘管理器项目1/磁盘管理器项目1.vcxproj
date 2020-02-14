@@ -126,12 +126,15 @@
     <ClCompile Include="fileManager.cpp" />
     <ClCompile Include="fileuntil.cpp" />
     <ClCompile Include="MD5.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="Tool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fileManager.h" />
     <ClInclude Include="fileuntil.h" />
     <ClInclude Include="MD5.h" />
+    <ClInclude Include="Tool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

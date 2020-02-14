@@ -1,4 +1,5 @@
 #include "fileuntil.h"
+
 void searchDisk(const std::string& path, std::unordered_set<std::string>subFiles)
 {
 	std::string matchFile = path + "\\" + "*.*";
@@ -26,6 +27,7 @@ void searchDisk(const std::string& path, std::unordered_set<std::string>subFiles
 	} while (_findnext(handle, &fileAttr) == 0);
 	_findclose(handle);
 }
+
 
 
 //É¾³ýÎÄ¼þ
