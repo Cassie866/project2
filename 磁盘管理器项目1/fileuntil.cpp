@@ -1,13 +1,13 @@
 #include "fileuntil.h"
 
-void searchDisk(const std::string& path, std::unordered_set<std::string>subFiles)
+void SearchDisk(const std::string& path, std::unordered_set<std::string>&subFiles)
 {
 	std::string matchFile = path + "\\" + "*.*";
 	_finddata_t fileAttr;
 	long handle = _findfirst(matchFile.c_str(), &fileAttr);
 	if (handle == -1)
 	{
-		perror("search failed!");
+		perror("Search failed!");
 		std::cout << matchFile << std::endl;
 		return;
 	}
@@ -17,7 +17,7 @@ void searchDisk(const std::string& path, std::unordered_set<std::string>subFiles
 		{
 			if (strcmp(fileAttr.name, ".") != 0 && strcmp(fileAttr.name, "..") != 0)
 			{
-				searchDisk(path + "\\" + fileAttr.name, subFiles);
+				SearchDisk(path + "\\" + fileAttr.name, subFiles);
 			}
 		}
 		else
@@ -31,14 +31,14 @@ void searchDisk(const std::string& path, std::unordered_set<std::string>subFiles
 
 
 //É¾³ýÎÄ¼þ
-void deleteFile(const char* filename)
+void DeleteFile(const char* fileName)
 {
-	if (remove(filename) == 0)
+	if (remove(fileName) == 0)
 	{
-		std::cout << "delete file:" << filename << "success!" << std::endl;
+		std::cout << "Delete file :      " << fileName << "     success!" << std::endl;
 	}
 	else
 	{
-		perror("delete file failed!");
+		perror("Delete file failed!");
 	}
 }

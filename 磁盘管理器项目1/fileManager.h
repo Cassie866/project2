@@ -7,23 +7,22 @@
 class FileManager
 {
 public:
-	void scanDisk(const std::string& path);
-	void getMd5toFiles();
-	void getCopyList();
+	void ScanDisk(const std::string& path);
+	void GetMd5toFiles();
+	void GetCopyList();
 
-	//所有的删除要保证一个文件不存在副本
-	void deleteByName(const std::string& name);
-	void deleteByMD5(const std::string& md5);
-	void deleteByMD52(const std::string& md5);
-	void deleteAllCopy();
-	void deleteByMatchName(const std::string& matchName);
+	void DeleteByName(const std::string& name);
+	void DeleteByMD5(const std::string& md5);
+	void DeleteByMD52(const std::string& md5);
+	void DeleteAllCopy();
+	//void DeleteByMatchName(const std::string& matchName);
 
-	void showCopyList();
-	void showAllFiles();
+	void ShowCopyList();
+	void ShowAllFiles();
 
 private:
-	std::unordered_set<std::string> _files;
-	std::unordered_multimap<std::string, std::string>_md5toFiles;
-	std::unordered_map<std::string, std::string>_filestoMd5;
+	std::unordered_set<std::string> _files;   //保存所有文件
+	std::unordered_multimap<std::string, std::string>_md5toFiles;    //MD5，文件
+	std::unordered_map<std::string, std::string>_filetoMd5;    //文件，MD5
 	MD5 _md5;
 };

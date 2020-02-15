@@ -1,16 +1,9 @@
 #include "Tool.h"
 
-void testFM()
-{
-	FileManager fm;
-	std::string path = "D:\\fileManagerTestDir";
-	fm.scanDisk(path);
-}
-
 void menu()
 {
 	std::cout << "******************************" << std::endl;
-	std::cout<<"1É¨Ãè      2showall     3showcopy    4nameÉ¾³ý      5md5É¾³ý     6È«É¾    7Ä£ºý    0ÍË³ö"<<std::endl;
+	std::cout<<"1É¨Ãè      2showall     3showcopy    4nameÉ¾³ý      5md5É¾³ý     6È«É¾    0ÍË³ö"<<std::endl;
 }
 
 
@@ -28,25 +21,22 @@ void testFileManagerTool()
 		switch (input)
 		{
 		case 1:
-			fmt.sacnner();
+			fmt.Sacnner();
 			break;
 		case 2:
-			fmt.showAllFiles();
+			fmt.ShowAllFiles();
 			break;
 		case 3:
-			fmt.showCopy();
+			fmt.ShowCopy();
 			break;
 		case 4:
-			fmt.deletebyName();
+			fmt.DeletebyName();
 			break;
 		case 5:
-			fmt.deletebyMD5();
+			fmt.DeletebyMD5();
 			break;
 		case 6:
-			fmt.deleteAllCopy();
-			break;
-		case 7:
-			fmt.deleteFuzzMatchCopy();
+			fmt.DeleteAllCopy();
 			break;
 		case 0:
 			break;

@@ -5,13 +5,13 @@
 class FileManagerTool
 {
 public:
-	void sacnner();
-	void deletebyMD5();
-	void deletebyName();
-	void deleteAllCopy();
-	void deleteFuzzMatchCopy();
-	void showCopy();
-	void showAllFiles();
+	void Sacnner();
+	void DeletebyMD5();
+	void DeletebyName();
+	void DeleteAllCopy();
+	//void DeleteFuzzMatchCopy();
+	void ShowCopy();
+	void ShowAllFiles();
 private:
 	FileManager _fm;
 };

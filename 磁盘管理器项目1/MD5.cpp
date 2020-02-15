@@ -1,12 +1,10 @@
 #include <iostream>
 #include <fstream>
-
 #include "MD5.h"
 
 
-
-//初m始化static成员
-int MD5::s[64] = {
+//初始化static成员
+int MD5::_s[64] = {
 	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7,  12, 17, 22,
 	5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
 	4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
@@ -20,9 +18,9 @@ MD5::MD5()
 
 void MD5::Init()
 {
-	for (int i = 0; i < 64; ++i)
+	for (int i = 0; i < CHUNK_BYTE; ++i)
 	{
-		k[i] = (uint32)(abs(sin(i + 1.0)) * pow(2.0, 32));
+		_k[i] = (uint32)(abs(sin(i + 1.0)) * pow(2.0, 32));
 	}
 	Reset();
 }
@@ -34,9 +32,9 @@ void MD5::Reset()
 	_b = 0xefcdab89; 
 	_c = 0x98badcfe; 
 	_d = 0x10325476;
-	memset(_chunk, 0, 64);
-	lastByte = 0;
-	allBytes = 0;
+	memset(_chunk, 0, CHUNK_BYTE);
+	_lastByte = 0;
+	_allBytes = 0;
 }
 
 
@@ -70,7 +68,7 @@ void MD5:: CalMD5(uint32* chunk)
 		int temp = d;
 		d = c;
 		c = b;
-		b = b + LeftShift((a + m + k[i] + chunk[g]), s[i]);
+		b = b + LeftShift((a + m + _k[i] + chunk[g]), _s[i]);
 		a = temp;
 	}
 	_a += a;
@@ -82,9 +80,9 @@ void MD5:: CalMD5(uint32* chunk)
 
 void MD5::CalFinalMD5()
 {
-	char* p = _chunk + lastByte;
+	char* p = _chunk + _lastByte;
 	*p++ = 0x80;
-	int remain = 64 - lastByte - 1;
+	int remain = CHUNK_BYTE - _lastByte - 1;
 	if (remain < 8)
 	{
 		memset(p, 0, remain);
@@ -95,24 +93,25 @@ void MD5::CalFinalMD5()
 	{
 		memset(p, 0, remain);
 	}
-	unsigned long long allBites = allBytes;
+	unsigned long long allBites = _allBytes;
 	allBites *= 8;
 	((unsigned long long*)_chunk)[7] = allBites;
 	CalMD5((uint32*)_chunk);
 }
 
 
-std::string MD5::Change(uint32 n)
+std::string MD5::Int2StringH(uint32 n)
 {
 	static std::string strmap = "0123456789abcdef";
 	std::string ret;
+
 	//获取每一个字节数据
 	for (int i = 0; i < 4; ++i)
 	{
 		int cur = (n >> (i * 8)) & 0xff;
 		//数据转成16进制字符
 		std::string curR;
-		//除以16获取高位，模16获取低位,字节内不逆序
+		//除以16获取高位，模16获取低位，字节内不逆序
 		curR += strmap[cur / 16];
 		curR += strmap[cur % 16];		
 		ret += curR;
@@ -121,73 +120,48 @@ std::string MD5::Change(uint32 n)
 }
 
 
-std::string MD5::GetstringMD5(const std:: string& str)
+std::string MD5::GetStringMD5(const std::string& str)
 {
 	if (str.empty())
 	{
-		Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
+		Int2StringH(_a).append(Int2StringH(_b)).append(Int2StringH(_c)).append(Int2StringH(_d));
 	}
-	allBytes = str.size();
-	uint32 chunknum = allBytes / 64;
-	const char* strptr = str.c_str();
-	for (int i = 0; i < chunknum; ++i)
+	_allBytes = str.length();
+	uint32 chunkNum = _allBytes / CHUNK_BYTE;
+	const char* strP = str.c_str();
+	for (int i = 0; i < chunkNum; ++i)
 	{
-		memcpy(_chunk, strptr + i * 64, 64);
+		memcpy(_chunk, strP+ i * CHUNK_BYTE, CHUNK_BYTE);
 		CalMD5((uint32*)_chunk);
 	}
-	lastByte + allBytes % 64;
-	memcpy(_chunk, strptr + chunknum * 64, lastByte);
+	_lastByte + _allBytes % CHUNK_BYTE;
+	memcpy(_chunk, strP + chunkNum * CHUNK_BYTE, _lastByte);
 	CalFinalMD5();
-	return Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
+	return Int2StringH(_a).append(Int2StringH(_b)).append(Int2StringH(_c)).append(Int2StringH(_d));
 }
-
-
 
 
 std::string MD5::GetFilesMD5(const char* filePath)
 {
-	std::ifstream fin(filePath,std::ifstream::binary);
+	std::ifstream fin(filePath, std::ifstream::binary);
 	if (!fin.is_open())
 	{
 		std::cout << filePath;
-		perror("file open failed!");
+		perror("File open failed!");
 		return "";
 	}
 	while (!fin.eof())
 	{
-		/*//全部读进来，空间换时间
-		fin.seekg(0, fin.end);
-		uint32 length = fin.tellg();
-		fin.seekg(0, fin.beg);
-		char* allData = new char[length];
-		fin.read(allData, length);*/
-
-		//每次读取一块数据 时间换空间
-		fin.read(_chunk, 64);
-		if (64 != fin.gcount())
+		fin.read(_chunk, CHUNK_BYTE);
+		if (CHUNK_BYTE != fin.gcount())
 		{
 			break;
 		}
-		allBytes += 64;
+		_allBytes += CHUNK_BYTE;
 		CalMD5((uint32*)_chunk);
 	}
-	lastByte = fin.gcount();
-	allBytes += lastByte;
+	_lastByte = fin.gcount();
+	_allBytes += _lastByte;
 	CalFinalMD5();
-	return Change(_a).append(Change(_b)).append(Change(_c)).append(Change(_d));
+	return Int2StringH(_a).append(Int2StringH(_b)).append(Int2StringH(_c)).append(Int2StringH(_d));
 }
-
-
-
-
-
-//int main()
-//{
-//	long size = GetFileSize("1.txt");
-//	long length = size * 8;
-//	long weishu=Add(length);
-//	ofstream file;
-//	file.open("1.txt", ios::ate|ios::binary);
-//	file.close();
-//	return 0;
-//}

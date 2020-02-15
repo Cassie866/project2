@@ -1,50 +1,49 @@
-
 #include "Tool.h"
 
-void FileManagerTool::sacnner()
+void FileManagerTool::Sacnner()
 {
 	std::cout << "请输入要扫描的文件夹：" << std::endl;
 	std::string path;
 	getline(std::cin, path);
-	_fm.scanDisk(path);
+	_fm.ScanDisk(path);
 }
 
-void FileManagerTool::deletebyMD5()
+void FileManagerTool::DeletebyMD5()
 {
 	std::cout << "请输入要删除文件的MD5值：" << std::endl;
 	std::string md5;
 	std::cin >> md5;
-	_fm.deleteByMD5(md5);
+	_fm.DeleteByMD5(md5);
 }
 
-void FileManagerTool::deletebyName()
+void FileManagerTool::DeletebyName()
 {
 	std::cout << "请输入要删除的文件名：" << std::endl;
 	std::string f;
 	getline(std::cin, f);
-	_fm.deleteByName(f);
+	_fm.DeleteByName(f);
 }
 
-void FileManagerTool::deleteAllCopy()
+void FileManagerTool::DeleteAllCopy()
 {
-	_fm.deleteAllCopy();
+	_fm.DeleteAllCopy();
 }
 
-void FileManagerTool::deleteFuzzMatchCopy()
+//void FileManagerTool::deleteFuzzMatchCopy()
+//{
+//	std::cout << "请输入匹配文件名：" << std::endl;
+//	std::string match;
+//	getline(std::cin, match);
+//	_fm.deleteByMatchName(match);
+//}
+
+void FileManagerTool::ShowCopy()
 {
-	std::cout << "请输入匹配文件名：" << std::endl;
-	std::string match;
-	getline(std::cin, match);
-	_fm.deleteByMatchName(match);
+	_fm.ShowCopyList();
 }
 
-void FileManagerTool::showCopy()
-{
-	_fm.showAllFiles();
-}
 
-
-void FileManagerTool::showAllFiles()
+void FileManagerTool::ShowAllFiles()
 {
-	_fm.showAllFiles();
+	_fm.ShowAllFiles();
 }

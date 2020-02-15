@@ -1,19 +1,18 @@
-#include "fileManager.h"
 #include "fileuntil.h"
+#include "fileManager.h"
 
 
-void FileManager::scanDisk(const std::string& path)
+void FileManager::ScanDisk(const std::string& path)
 {
 	_files.clear();
-	searchDisk(path, _files);
-	std::cout << "all files" << std::endl;
-	showAllFiles();
-	getMd5toFiles();
-	showCopyList();
-	getCopyList();
+	SearchDisk(path, _files);
+	std::cout << "All files :" << std::endl;
+	ShowAllFiles();
+	GetMd5toFiles();
+	GetCopyList();
 }
 
-void FileManager::getMd5toFiles()
+void FileManager::GetMd5toFiles()
 {
 	_md5toFiles.clear();
 	for (const auto& f : _files)
@@ -24,9 +23,9 @@ void FileManager::getMd5toFiles()
 }
 
 
-void FileManager::getCopyList()
+void FileManager::GetCopyList()
 {
-	_filestoMd5.clear();
+	_filetoMd5.clear();
 	auto it = _md5toFiles.begin();
 	while (it !=_md5toFiles.end())
 	{
@@ -36,14 +35,14 @@ void FileManager::getCopyList()
 			auto begin = pairIt.first;
 			while (begin != pairIt.second)
 			{
-				_filestoMd5.insert(make_pair(begin->second, begin->first));
+				_filetoMd5.insert(make_pair(begin->second, begin->first));
 				++begin;
 			}
 			it = pairIt.second;
 		}
 		else
 		{
-			_files.erase(it->second);
+			//_files.erase(it->second);
 			it = _md5toFiles.erase(it);
 		}
 	}
@@ -51,17 +50,15 @@ void FileManager::getCopyList()
 
 
 
-
-//所有的删除，保证一个文件不存在副本
-void FileManager::deleteByName(const std::string& name)
+void FileManager::DeleteByName(const std::string& name)
 {
 	if (_md5toFiles.count(name) == 0)
 	{
-		std::cout << name << "not exist!" << std::endl;
+		std::cout << name << "Not exist!" << std::endl;
 		return;
 	}
-	std::string curMD5 = _filestoMd5[name];
-	std::cout << name << "--->" << _md5toFiles.count(curMD5) << std::endl;
+	std::string curMD5 = _filetoMd5[name];
+	std::cout << "与" << name << "内容相同的文件共有" << _md5toFiles.count(curMD5) << "个" << std::endl;
 	auto pairIt = _md5toFiles.equal_range(curMD5);
 	auto curIt = pairIt.first;
 	int count = 0;
@@ -70,8 +67,8 @@ void FileManager::deleteByName(const std::string& name)
 		if (curIt->second != name)
 		{
 			_files.erase(curIt->second);
-			_filestoMd5.erase(curIt->second);
-			deleteFile(curIt->second.c_str());
+			_filetoMd5.erase(curIt->second);
+			DeleteFile(curIt->second.c_str());
 			++count;
 		}
 		++curIt;
@@ -87,52 +84,51 @@ void FileManager::deleteByName(const std::string& name)
 		}
 		++curIt;
 	}
-	std::cout << "删除文件" << count << std::endl;
+	std::cout << "共删除文件" << count <<"个"<< std::endl;
 }
 
 
-void FileManager::deleteByMD5(const std::string& md5)
+void FileManager::DeleteByMD5(const std::string& md5)
 {
 	if (_md5toFiles.count(md5) == 0)
 	{
-		std::cout << md5 << "不存在!" << std::endl;
+		std::cout << md5 << "Not exist!" << std::endl;
 		return;
 	}
 	auto pairIt = _md5toFiles.equal_range(md5);
-	std::cout << md5 << "---->" << _md5toFiles.count(md5) << std::endl;
+	std::cout << "与" << md5 << "内容相同的文件共有" << _md5toFiles.count(md5) << "个" << std::endl;
 	auto curIt = pairIt.first;
 	++curIt;
 	int count = 0;
 	while (curIt != pairIt.second)
 	{
 		_files.erase(curIt->second);
-		_filestoMd5.erase(curIt->second);
-		deleteFile(curIt->second.c_str());
+		_filetoMd5.erase(curIt->second);
+		DeleteFile(curIt->second.c_str());
 		++count;
 		++curIt;
 	}
 	curIt = pairIt.first;
 	++curIt;
 	_md5toFiles.erase(curIt, pairIt.second);
-	std::cout << "删除文件" << count << std::endl;
-
+	std::cout << "共删除文件" << count << "个" << std::endl;
 }
 
 
-void FileManager::deleteByMD52(const std::string& md5)
+void FileManager::DeleteByMD52(const std::string& md5)
 {
 	if (_md5toFiles.count(md5) == 0)
 	{
-		std::cout << md5 << "不存在!" << std::endl;
+		std::cout << md5 << "Not exist!" << std::endl;
 		return;
 	}
 	auto it = _md5toFiles.find(md5);
-	deleteByName(it->second);
+	DeleteByName(it->second);
 }
 
 
 
-void FileManager::deleteAllCopy()
+void FileManager::DeleteAllCopy()
 {
 	std::unordered_set<std::string>md5Set;
 	for (const auto& p : _md5toFiles)
@@ -141,13 +137,14 @@ void FileManager::deleteAllCopy()
 	}
 	for (const auto& md5 : md5Set)
 	{
-		deleteByMD5(md5);
+		DeleteByMD5(md5);
 	}
 }
 
 
 
-void FileManager::deleteByMatchName(const std::string& matchName)
+/*
+void FileManager::DeleteByMatchName(const std::string& matchName)
 {
 	std::unordered_set<std::string>allFiles;
 	for (const auto& f : _files)
@@ -157,14 +154,14 @@ void FileManager::deleteByMatchName(const std::string& matchName)
 	}
 	for (const auto& f : allFiles)
 	{
-		if (_filestoMd5.count(f) != 0)
-			deleteByName(f);
+		if (_filetoMd5.count(f) != 0)
+			DeleteByName(f);
 	}
 }
+*/
 
 
-
-void FileManager::showCopyList()
+void FileManager::ShowCopyList()
 {
 	auto it = _md5toFiles.begin();
 	int total = _md5toFiles.size();
@@ -174,14 +171,13 @@ void FileManager::showCopyList()
 		int idx = 1;
 		auto paitIt = _md5toFiles.equal_range(it->first);
 		auto curIt = paitIt.first;
-		std::cout << "cur MD5:" << it->first << std::endl;
+		std::cout << "当前MD5:" << it->first << std::endl;
 		while (curIt != paitIt.second)
 		{
-			std::cout << "\t第" << idx << "个文件：";
-			std::cout << curIt->second << std::endl;
+			std::cout << "\t第" << idx << "个文件：" << curIt->second << std::endl;;
 			++curIt;
 			++idx;
-			count++;
+			++count;
 		}
 		it = paitIt.second;
 	}
@@ -189,7 +185,7 @@ void FileManager::showCopyList()
 }
 
 
-void FileManager::showAllFiles()
+void FileManager::ShowAllFiles()
 {
 	for (const auto& f : _files)
 	{
